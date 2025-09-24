@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest Hub - Retailer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .modal-backdrop, .sidebar-backdrop {
+            background-color: rgba(0,0,0,0.5);
+            transition: opacity 0.3s ease-in-out;
+        }
+        aside {
+            transition: transform 0.3s ease-in-out;
+        }
+        .body-no-scroll {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="relative min-h-screen md:flex">
+        <!-- Mobile Sidebar Backdrop -->
+        <div id="sidebar-backdrop" class="sidebar-backdrop fixed inset-0 z-20 hidden"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="w-64 bg-white border-r fixed inset-y-0 left-0 z-30 transform -translate-x-full md:relative md:translate-x-0">
+            <div class="flex flex-col h-full">
+                <div class="h-16 flex items-center justify-center border-b">
+                    <a href="#" class="text-2xl font-bold text-green-600">Harvest Hub</a>
+                </div>
+                <nav id="main-nav" class="flex-1 p-4 space-y-2">
+                    <a href="#" data-view="dashboard" class="nav-link flex items-center px-4 py-2 text-white bg-green-600 rounded-md">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        Dashboard
+                    </a>
+                    <a href="#" data-view="orders" class="nav-link flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        My Orders
+                    </a>
+                </nav>
+                <div class="p-4 border-t">
+                     <a href="#" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-16 flex items-center justify-between px-6 bg-white border-b">
+                 <div class="flex items-center">
+                    <button id="mobile-menu-btn" class="md:hidden mr-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <h1 id="page-title" class="text-xl md:text-2xl font-semibold text-gray-800">Farmers Nearby</h1>
+                 </div>
+                 <div class="flex items-center">
+                    <button id="cart-button" class="relative mr-4">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                    <div class="font-semibold text-sm sm:text-base hidden sm:block">Welcome, Retailer Inc.</div>
+                 </div>
+            </header>
+            
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
+                <!-- Dashboard View -->
+                <div id="dashboard-view">
+                    <div class="mb-6">
+                        <input type="text" id="search-bar" placeholder="Search for farmers or crops..." class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div id="farmer-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Farmer cards will be injected here -->
+                    </div>
+                </div>
+
+                <!-- My Orders View -->
+                <div id="orders-view" class="hidden">
+                    <div id="order-list" class="space-y-4">
+                        <!-- Order items will be injected here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center flex-shrink-0">
+                <h2 class="text-xl md:text-2xl font-semibold">Products from <span id="modal-farmer-name"></span></h2>
+                <button class="close-modal-btn text-2xl font-bold">&times;</button>
+            </div>
+            <div id="modal-body" class="p-4 md:p-6 overflow-y-auto">
+                <!-- Product list will be injected here -->
+            </div>
+            <div class="p-4 border-t bg-gray-50 text-right flex-shrink-0">
+                <button class="close-modal-btn px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h2 class="text-xl md:text-2xl font-semibold">Your Order</h2>
+                <button id="close-cart-btn" class="text-2xl font-bold">&times;</button>
+            </div>
+            <div id="cart-items" class="p-6 max-h-96 overflow-y-auto">
+                <!-- Cart items will be injected here -->
+            </div>
+            <div class="p-6 border-t bg-gray-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Total:</span>
+                    <span id="cart-total">₹0.00</span>
+                </div>
+                 <div class="flex justify-between font-semibold text-md text-green-600 mb-4">
+                    <span>20% Upfront Payment:</span>
+                    <span id="cart-upfront">₹0.00</span>
+                </div>
+                <button id="checkout-btn" class="w-full bg-green-600 text-white py-3 rounded-md font-bold hover:bg-green-700 disabled:bg-gray-400" disabled>Proceed to Pay</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden p-4">
+        <div class="bg-white rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Order Placed!</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">Your order has been sent. You can track its status in the 'My Orders' section.</p>
+            </div>
+            <div class="mt-4">
+                <button id="close-success-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">OK</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- MOCK DATA ---
+    const farmers = [
+        { id: 1, name: 'Ram Singh', location: 'Bhopal, MP', rating: 4.8, image: 'https://placehold.co/100x100/A3E635/4D7C0F?text=RS', products: [
+            { id: 101, name: 'Tomatoes', type: 'Ready-Made', price: 30, unit: 'kg', image: 'https://placehold.co/400x300/EF4444/FFFFFF?text=Tomatoes' },
+            { id: 102, name: 'Potatoes', type: 'Ready-Made', price: 20, unit: 'kg', image: 'https://placehold.co/400x300/FBBF24/FFFFFF?text=Potatoes' },
+            { id: 103, name: 'Wheat', type: 'To-be-Made', price: 2500, unit: 'quintal', eta: '3 months', image: 'https://placehold.co/400x300/F59E0B/FFFFFF?text=Wheat' },
+        ]},
+        { id: 2, name: 'Sita Devi', location: 'Indore, MP', rating: 4.9, image: 'https://placehold.co/100x100/60A5FA/1E40AF?text=SD', products: [
+            { id: 201, name: 'Onions', type: 'Ready-Made', price: 25, unit: 'kg', image: 'https://placehold.co/400x300/F472B6/FFFFFF?text=Onions' },
+            { id: 202, name: 'Organic Carrots', type: 'Ready-Made', price: 50, unit: 'kg', image: 'https://placehold.co/400x300/FB923C/FFFFFF?text=Carrots' },
+            { id: 203, name: 'Soybean', type: 'To-be-Made', price: 4500, unit: 'quintal', eta: '4 months', image: 'https://placehold.co/400x300/8B5CF6/FFFFFF?text=Soybean' },
+        ]},
+        { id: 3, name: 'Arjun Patel', location: 'Sehore, MP', rating: 4.7, image: 'https://placehold.co/100x100/F87171/7F1D1D?text=AP', products: [
+            { id: 301, name: 'Basmati Rice', type: 'Ready-Made', price: 80, unit: 'kg', image: 'https://placehold.co/400x300/D1D5DB/FFFFFF?text=Rice' },
+            { id: 302, name: 'Coriander', type: 'Ready-Made', price: 10, unit: 'bunch', image: 'https://placehold.co/400x300/34D399/FFFFFF?text=Coriander' },
+        ]},
+    ];
+
+    let orders = [
+        { id: 'HH001', farmer: 'Ram Singh', date: '2025-09-15', total: 1500, status: 'Delivered', items: [{ name: 'Tomatoes', qty: 50, unit: 'kg' }] },
+        { id: 'HH002', farmer: 'Sita Devi', date: '2025-09-18', total: 2250, status: 'Processing', items: [{ name: 'Onions', qty: 90, unit: 'kg' }] }
+    ];
+
+    let cart = [];
+
+    // --- DOM ELEMENTS ---
+    const body = document.body;
+    const farmerList = document.getElementById('farmer-list');
+    const orderList = document.getElementById('order-list');
+    const pageTitle = document.getElementById('page-title');
+    const dashboardView = document.getElementById('dashboard-view');
+    const ordersView = document.getElementById('orders-view');
+    const productModal = document.getElementById('product-modal');
+    const cartModal = document.getElementById('cart-modal');
+    const successModal = document.getElementById('success-modal');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    // --- RENDER FUNCTIONS ---
+    function renderFarmers(farmersToRender) {
+        farmerList.innerHTML = '';
+        if (farmersToRender.length === 0) {
+            farmerList.innerHTML = `<p class="text-gray-500 col-span-full text-center">No farmers found.</p>`;
+            return;
+        }
+        farmersToRender.forEach(farmer => {
+            const farmerCard = `
+                <div class="bg-white p-4 rounded-lg shadow-md flex items-start space-x-4">
+                    <img src="${farmer.image}" alt="${farmer.name}" class="w-16 h-16 rounded-full flex-shrink-0">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold">${farmer.name}</h3>
+                        <p class="text-gray-500 text-sm">${farmer.location}</p>
+                        <div class="flex items-center mt-1">
+                            <span class="text-yellow-500">★</span>
+                            <span class="ml-1 font-semibold">${farmer.rating}</span>
+                        </div>
+                        <button data-farmer-id="${farmer.id}" class="view-products-btn mt-3 bg-green-100 text-green-700 px-3 py-1.5 rounded-md text-sm font-semibold hover:bg-green-200">View Crops</button>
+                    </div>
+                </div>`;
+            farmerList.innerHTML += farmerCard;
+        });
+    }
+    
+    function renderOrders() {
+        orderList.innerHTML = '';
+        if (orders.length === 0) {
+            orderList.innerHTML = `<p class="text-center text-gray-500">You have no past or active orders.</p>`;
+            return;
+        }
+        // Sort newest first
+        orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        orders.forEach(order => {
+            let statusColor, statusText;
+            switch(order.status) {
+                case 'Delivered':
+                    statusColor = 'bg-green-100 text-green-800'; statusText = 'Delivered'; break;
+                case 'Processing':
+                    statusColor = 'bg-blue-100 text-blue-800'; statusText = 'Processing'; break;
+                default:
+                    statusColor = 'bg-yellow-100 text-yellow-800'; statusText = 'Pending';
+            }
+            const orderItem = `
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <div class="mb-3 sm:mb-0">
+                            <p class="font-bold">Order #${order.id} <span class="ml-2 text-sm font-normal text-gray-500">from ${order.farmer}</span></p>
+                            <p class="text-sm text-gray-600">Date: ${new Date(order.date).toLocaleDateString('en-IN')}</p>
+                            <p class="text-sm text-gray-500">${order.items.map(i => `${i.qty} ${i.unit} ${i.name}`).join(', ')}</p>
+                        </div>
+                        <div class="text-left sm:text-right">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${statusText}</span>
+                            <p class="font-bold text-lg mt-1">₹${order.total.toFixed(2)}</p>
+                        </div>
+                    </div>
+                    ${order.status === 'Delivered' ? '<button class="rate-btn mt-3 text-sm text-blue-600 hover:underline">Rate this transaction</button>' : ''}
+                </div>`;
+            orderList.innerHTML += orderItem;
+        });
+    }
+
+    function renderProductsInModal(farmerId) {
+        const farmer = farmers.find(f => f.id == farmerId);
+        document.getElementById('modal-farmer-name').textContent = farmer.name;
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = '';
+
+        farmer.products.forEach(product => {
+            const productCard = `
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b py-4">
+                    <div class="flex items-center mb-3 sm:mb-0">
+                        <img src="${product.image}" alt="${product.name}" class="w-20 h-20 object-cover rounded-md mr-4 flex-shrink-0">
+                        <div>
+                            <h4 class="text-lg font-semibold">${product.name}</h4>
+                            <p class="text-sm text-gray-500">${product.type === 'Ready-Made' ? 'Available now' : `ETA: ${product.eta}`}</p>
+                            <p class="font-bold text-green-600">₹${product.price} / ${product.unit}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 w-full sm:w-auto">
+                         <input type="number" min="1" class="w-20 p-2 border rounded-md text-center" placeholder="Qty">
+                         <button data-product-id="${product.id}" data-farmer-id="${farmer.id}" class="add-to-cart-btn flex-grow sm:flex-grow-0 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Add</button>
+                    </div>
+                </div>`;
+            modalBody.innerHTML += productCard;
+        });
+    }
+
+    function renderCart() {
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartCount = document.getElementById('cart-count');
+        const cartTotalEl = document.getElementById('cart-total');
+        const cartUpfrontEl = document.getElementById('cart-upfront');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        
+        cartItemsContainer.innerHTML = '';
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = `<p class="text-gray-500 text-center">Your cart is empty.</p>`;
+            cartCount.classList.add('hidden');
+            checkoutBtn.disabled = true;
+        } else {
+            cartCount.classList.remove('hidden');
+            checkoutBtn.disabled = false;
+        }
+
+        let total = 0;
+        let uniqueItems = 0;
+        cart.forEach(item => {
+            total += item.price * item.quantity;
+            uniqueItems++;
+            const cartItem = `
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="font-semibold">${item.name} (x${item.quantity} ${item.unit})</p>
+                        <p class="text-sm text-gray-500">from ${item.farmerName}</p>
+                    </div>
+                    <p class="font-bold">₹${(item.price * item.quantity).toFixed(2)}</p>
+                </div>`;
+            cartItemsContainer.innerHTML += cartItem;
+        });
+
+        cartTotalEl.textContent = `₹${total.toFixed(2)}`;
+        cartUpfrontEl.textContent = `₹${(total * 0.20).toFixed(2)}`;
+        cartCount.textContent = uniqueItems;
+    }
+    
+    // --- SIDEBAR & NAVIGATION ---
+    function toggleSidebar() {
+        sidebar.classList.toggle('-translate-x-full');
+        sidebarBackdrop.classList.toggle('hidden');
+        body.classList.toggle('body-no-scroll');
+    }
+    
+    function switchView(view) {
+        document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+        document.getElementById(`${view}-view`).classList.remove('hidden');
+        
+        document.querySelectorAll('.nav-link').forEach(a => {
+            a.classList.remove('bg-green-600', 'text-white');
+            a.classList.add('text-gray-600');
+        });
+        
+        const activeLink = document.querySelector(`.nav-link[data-view="${view}"]`);
+        activeLink.classList.add('bg-green-600', 'text-white');
+        activeLink.classList.remove('text-gray-600');
+
+        pageTitle.textContent = view === 'dashboard' ? 'Farmers Nearby' : 'My Orders';
+        if (view === 'orders') renderOrders();
+
+        if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) {
+            toggleSidebar();
+        }
+    }
+    
+    // --- EVENT LISTENERS ---
+    document.getElementById('mobile-menu-btn').addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+    
+    document.getElementById('main-nav').addEventListener('click', (e) => {
+        const link = e.target.closest('.nav-link');
+        if (link) {
+            e.preventDefault();
+            switchView(link.dataset.view);
+        }
+    });
+
+    document.getElementById('search-bar').addEventListener('keyup', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredFarmers = farmers.filter(farmer => 
+            farmer.name.toLowerCase().includes(searchTerm) ||
+            farmer.location.toLowerCase().includes(searchTerm) ||
+            farmer.products.some(p => p.name.toLowerCase().includes(searchTerm))
+        );
+        renderFarmers(filteredFarmers);
+    });
+
+    farmerList.addEventListener('click', e => {
+        const button = e.target.closest('.view-products-btn');
+        if (button) {
+            const farmerId = button.dataset.farmerId;
+            renderProductsInModal(farmerId);
+            productModal.classList.remove('hidden');
+        }
+    });
+
+    productModal.addEventListener('click', e => {
+        if (e.target.matches('.close-modal-btn')) {
+            productModal.classList.add('hidden');
+        }
+        if (e.target.matches('.add-to-cart-btn')) {
+            const button = e.target;
+            const productId = button.dataset.productId;
+            const farmerId = button.dataset.farmerId;
+            const quantity = parseInt(button.previousElementSibling.value);
+
+            if (isNaN(quantity) || quantity <= 0) {
+                alert('Please enter a valid quantity.'); return;
+            }
+
+            const farmer = farmers.find(f => f.id == farmerId);
+            const product = farmer.products.find(p => p.id == productId);
+            
+            // Allow cart items from multiple farmers. For a real app, you might restrict this.
+            if (cart.length > 0 && cart.some(item => item.farmerId !== farmer.id)) {
+                 if (!confirm("You have items from another farmer in your cart. Starting a new cart will clear the existing one. Continue?")) {
+                    return;
+                }
+                cart = []; // Clear cart if user agrees
+            }
+
+            const existingItem = cart.find(item => item.id == productId);
+            if(existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ ...product, quantity, farmerName: farmer.name, farmerId: farmer.id });
+            }
+            
+            renderCart();
+            productModal.classList.add('hidden');
+        }
+    });
+
+    cartModal.addEventListener('click', e => {
+        if (e.target.matches('#close-cart-btn')) {
+            cartModal.classList.add('hidden');
+        }
+        if (e.target.matches('#checkout-btn')) {
+            if(cart.length === 0) return;
+
+            // Group items by farmer
+            const farmerItems = cart.reduce((acc, item) => {
+                acc[item.farmerName] = acc[item.farmerName] || [];
+                acc[item.farmerName].push(item);
+                return acc;
+            }, {});
+
+            // Create orders for each farmer
+            for (const farmerName in farmerItems) {
+                const items = farmerItems[farmerName];
+                const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                const newOrder = {
+                    id: `HH${String(orders.length + 1).padStart(3, '0')}`,
+                    farmer: farmerName,
+                    date: new Date().toISOString().split('T')[0], // Today's date
+                    total: total,
+                    status: 'Pending',
+                    items: items.map(i => ({ name: i.name, qty: i.quantity, unit: i.unit }))
+                };
+                orders.push(newOrder);
+            }
+            
+            cart = [];
+            cartModal.classList.add('hidden');
+            successModal.classList.remove('hidden');
+            renderCart();
+        }
+    });
+    
+    document.getElementById('cart-button').addEventListener('click', () => {
+        renderCart();
+        cartModal.classList.remove('hidden');
+    });
+
+    successModal.addEventListener('click', (e) => {
+        if (e.target.matches('#close-success-btn')) {
+            successModal.classList.add('hidden');
+            switchView('orders'); // Switch to orders view to see the new order
+        }
+    });
+
+    orderList.addEventListener('click', e => {
+        if (e.target.matches('.rate-btn')) {
+            alert('Rating functionality would be here!');
+        }
+    });
+
+    // --- INITIALIZATION ---
+    renderFarmers(farmers);
+});
+</script>
+
+</body>
+</html>

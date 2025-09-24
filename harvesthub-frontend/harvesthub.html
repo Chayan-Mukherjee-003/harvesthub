@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest Hub - Direct from Farm to Shelf</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2832&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        .section-icon {
+            stroke: #22c55e; /* green-500 */
+        }
+        /* Prevents body scroll when mobile menu is open */
+        .body-no-scroll {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navigation Bar -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-green-600">Harvest Hub</a>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#how-it-works" class="text-gray-600 hover:text-green-600">How It Works</a>
+                <a href="#for-users" class="text-gray-600 hover:text-green-600">For Farmers & Retailers</a>
+                <a href="#features" class="text-gray-600 hover:text-green-600">Features</a>
+                <a href="#about" class="text-gray-600 hover:text-green-600">About Us</a>
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="#" class="text-gray-600 hover:text-green-600">Login</a>
+                <a href="#" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">Sign Up</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-50">
+        <div class="flex flex-col items-center justify-center h-full">
+            <button id="close-menu-button" class="absolute top-6 right-6 text-gray-700">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <a href="#how-it-works" class="mobile-menu-link text-2xl text-gray-700 my-4">How It Works</a>
+            <a href="#for-users" class="mobile-menu-link text-2xl text-gray-700 my-4">For Users</a>
+            <a href="#features" class="mobile-menu-link text-2xl text-gray-700 my-4">Features</a>
+            <a href="#about" class="mobile-menu-link text-2xl text-gray-700 my-4">About Us</a>
+            <div class="border-t w-1/2 my-6"></div>
+            <a href="#" class="mobile-menu-link text-2xl text-gray-700 my-4">Login</a>
+            <a href="#" class="mobile-menu-link mt-4 bg-green-600 text-white px-8 py-3 rounded-md text-lg">Sign Up</a>
+        </div>
+    </div>
+
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section text-white text-center py-20 md:py-32">
+            <div class="container mx-auto px-6">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-4">Reaping Fair Rewards: The Direct Path from Farm to Shelf.</h1>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">Harvest Hub is a digital platform creating a direct, transparent, and secure connection between farmers and retailers.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="farmer/farmer.html" class="w-full sm:w-auto bg-green-600 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-green-700 transition-colors">I'm a Farmer</a>
+                    <a href="retailer/retailer.html" class="w-full sm:w-auto bg-white text-green-600 px-8 py-3 rounded-md text-lg font-semibold hover:bg-gray-100 transition-colors">I'm a Retailer</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Problem Section -->
+        <section class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Why Do Our Farmers Struggle?</h2>
+                <p class="max-w-4xl mx-auto text-gray-600 text-lg">
+                    Agriculture remains the backbone of India’s economy, yet the very farmers who feed our nation often struggle to earn fair profits due to middlemen who take a large portion of their earnings.
+                </p>
+            </div>
+        </section>
+
+        <!-- The Solution Section -->
+         <section class="py-16 md:py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Our Solution: A Fairer Marketplace</h2>
+                <p class="max-w-4xl mx-auto text-gray-600 text-lg">
+                   Harvest Hub addresses this challenge by creating a digital marketplace that empowers farmers and provides reliability to retailers, building a more sustainable future for Indian agriculture.
+                </p>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Simple, Secure, and Transparent</h2>
+                    <p class="max-w-2xl mx-auto mt-4 text-gray-600">Follow these four simple steps to get started on our platform.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <!-- Step 1-4 -->
+                    <div class="p-6">
+                        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mx-auto mb-4">
+                            <svg class="w-8 h-8 section-icon" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">1: Verified Registration</h3>
+                        <p class="text-gray-600">Farmers and retailers register with official IDs (Kisan Card, FSSAI) to ensure a trusted community.</p>
+                    </div>
+                    <div class="p-6">
+                         <div class="flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mx-auto mb-4">
+                            <svg class="w-8 h-8 section-icon" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">2: Place or Receive Orders</h3>
+                        <p class="text-gray-600">Retailers buy ready crops or pre-order future harvests directly from local, verified farmers.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mx-auto mb-4">
+                            <svg class="w-8 h-8 section-icon" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 18v-2m0-10a6 6 0 00-6 6c0 1.933 1.567 3.5 3.5 3.5s3.5 1.567 3.5 3.5a6 6 0 006-6c0-1.933-1.567-3.5-3.5-3.5S12 12.433 12 10.5z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">3: Secure Advance Payments</h3>
+                        <p class="text-gray-600">For pre-orders, retailers pay a 20% advance, giving farmers capital while securing the order.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mx-auto mb-4">
+                           <svg class="w-8 h-8 section-icon" fill="none" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2-2h8a1 1 0 001-1z M17 8h2.5a1 1 0 01.7.3l2.5 2.5a1 1 0 01.3.7V16a1 1 0 01-1 1h-1"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">4: Local Delivery & Final Payment</h3>
+                        <p class="text-gray-600">Trade is within a 200 km radius. Final payment is completed upon successful delivery.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-16 md:py-24">
+             <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Built on Trust and Innovation</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-2">Financial Security</h3>
+                        <p class="text-gray-600">Our unique payment system protects everyone with fair risk-sharing in case of unforeseen crop failures.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-2">Verified Community</h3>
+                        <p class="text-gray-600">Every user is verified. A two-way rating system builds transparency and rewards professionalism.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-2">Hyperlocal Sourcing</h3>
+                        <p class="text-gray-600">Our 200 km radius reduces costs, supports local economies, and ensures the freshest produce.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- For Farmers & Retailers Section -->
+        <section id="for-users" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
+                    <div class="bg-green-50 p-8 rounded-lg">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">For Our Farmers</h3>
+                        <h4 class="text-xl font-semibold text-green-700 mb-4">Take Control of Your Livelihood</h4>
+                        <ul class="space-y-3 text-gray-600 list-disc list-inside">
+                            <li><span class="font-semibold">Earn Fair Profits:</span> Sell directly to buyers and maximize your income.</li>
+                            <li><span class="font-semibold">Get Upfront Capital:</span> Receive a 20% advance on pre-orders.</li>
+                            <li><span class="font-semibold">Secure Your Sales:</span> Plan your harvest with confidence by accepting pre-orders.</li>
+                            <li><span class="font-semibold">Build Your Reputation:</span> Set your own prices and showcase your quality crops.</li>
+                        </ul>
+                        <a href="#" class="mt-6 inline-block bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">Start Selling on Harvest Hub</a>
+                    </div>
+                     <div class="bg-blue-50 p-8 rounded-lg">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">For Our Retailers</h3>
+                        <h4 class="text-xl font-semibold text-blue-700 mb-4">Source Smarter, Not Harder</h4>
+                        <ul class="space-y-3 text-gray-600 list-disc list-inside">
+                            <li><span class="font-semibold">Freshness Guaranteed:</span> Procure produce directly from local farms.</li>
+                            <li><span class="font-semibold">Reliable Supply Chain:</span> Secure your required quantity in advance with pre-orders.</li>
+                            <li><span class="font-semibold">Transparent Pricing:</span> Get fair market prices without hidden middleman fees.</li>
+                            <li><span class="font-semibold">Verified Partners:</span> Conduct business confidently with verified farmers.</li>
+                        </ul>
+                         <a href="#" class="mt-6 inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">Start Buying on Harvest Hub</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA Section -->
+        <section id="about" class="py-16 md:py-24 text-center">
+             <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Join Us in Strengthening Rural Livelihoods</h2>
+                <p class="max-w-3xl mx-auto mt-4 text-gray-600 text-lg">
+                    Be a part of a movement that empowers farmers, supports local economies, and builds a fairer agricultural marketplace.
+                </p>
+                <a href="#" class="mt-8 inline-block bg-green-600 text-white px-10 py-4 rounded-md text-lg font-semibold hover:bg-green-700 transition-colors">Get Started Today</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center sm:text-left">
+                <div>
+                    <h3 class="text-xl font-bold mb-2">Harvest Hub</h3>
+                    <p class="text-gray-400">Connecting farmers and retailers for a sustainable future.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#how-it-works" class="text-gray-400 hover:text-white">How It Works</a></li>
+                        <li><a href="#for-users" class="text-gray-400 hover:text-white">For Users</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white">Features</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Legal</h4>
+                     <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">GitHub Repo</h4>
+                    <div class="flex justify-center sm:justify-start">
+                        <a href="#" class="text-gray-400 hover:text-white ml-7">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
+                <p>Made with ❤️ by VAQ-U</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const closeMenuButton = document.getElementById('close-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+        const body = document.body;
+
+        const toggleMenu = () => {
+            mobileMenu.classList.toggle('hidden');
+            body.classList.toggle('body-no-scroll');
+        };
+
+        mobileMenuButton.addEventListener('click', toggleMenu);
+        closeMenuButton.addEventListener('click', toggleMenu);
+
+        // Close menu when a link is clicked
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+    </script>
+</body>
+</html>
