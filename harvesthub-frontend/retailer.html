@@ -469,6 +469,149 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- INITIALIZATION ---
     renderFarmers(farmers);
 });
+
+const API_HOST_RETAILER = (location.protocol === 'file:') ? 'http://localhost:4000' : '';
+const RETAILER_BASE = `${API_HOST_RETAILER}/api/retailer`;
+
+function retailerAuthHeaders() {
+  const token = localStorage.getItem('token');
+  return token ? { 'Authorization': 'Bearer ' + token } : {};
+}
+
+async function retailerRegister(data) {
+  const res = await fetch(`${RETAILER_BASE}/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+async function retailerLogin(credentials) {
+  const res = await fetch(`${RETAILER_BASE}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  const json = await res.json();
+  if (json.token) localStorage.setItem('token', json.token);
+  return json;
+}
+
+async function fetchAvailableCrops() {
+  const res = await fetch(`${RETAILER_BASE}/crops`, {
+    headers: { ...retailerAuthHeaders() }
+  });
+  if (!res.ok) {
+    console.error('Failed to fetch crops', res.status);
+    return [];
+  }
+  return res.json();
+}
+
+async function createOrder(order) {
+  const res = await fetch(`${RETAILER_BASE}/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...retailerAuthHeaders() },
+    body: JSON.stringify(order)
+  });
+  return res.json();
+}
+
+async function fetchOrders() {
+  const res = await fetch(`${RETAILER_BASE}/orders`, {
+    headers: { ...retailerAuthHeaders() }
+  });
+  if (!res.ok) {
+    console.error('Failed to fetch orders', res.status);
+    return [];
+  }
+  return res.json();
+}
+
+function renderCrops(items = []) {
+  const container = document.getElementById('cropsList');
+  if (!container) return;
+  container.innerHTML = items.length
+    ? items.map(c => `<div class="crop-item"><strong>${escapeHtml(c.name)}</strong> — ${c.quantity} @ ${c.price} <button data-id="${escapeHtml(c._id)}" class="order-btn">Order</button></div>`).join('')
+    : '<div>No crops available</div>';
+}
+
+function renderOrders(items = []) {
+  const container = document.getElementById('ordersList');
+  if (!container) return;
+  container.innerHTML = items.length
+    ? items.map(o => `<div class="order-item">#${escapeHtml(o._id)} — ${escapeHtml(o.crop?.name || o.itemName || '')} x${o.quantity} — ${o.status || 'pending'}</div>`).join('')
+    : '<div>No orders</div>';
+}
+
+function escapeHtml(str='') {
+  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // load crops and orders
+  fetchAvailableCrops().then(renderCrops).catch(e => console.error(e));
+  fetchOrders().then(renderOrders).catch(e => console.error(e));
+
+  // register form
+  const regForm = document.getElementById('registerForm');
+  if (regForm) {
+    regForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const f = new FormData(regForm);
+      const payload = { name: f.get('name'), email: f.get('email'), password: f.get('password') };
+      const res = await retailerRegister(payload);
+      alert(res.message || JSON.stringify(res));
+    });
+  }
+
+  // login form
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const f = new FormData(loginForm);
+      const res = await retailerLogin({ email: f.get('email'), password: f.get('password') });
+      alert(res.message || (res.token ? 'Logged in' : JSON.stringify(res)));
+      // refresh after login
+      if (res.token) {
+        fetchAvailableCrops().then(renderCrops).catch(e => console.error(e));
+        fetchOrders().then(renderOrders).catch(e => console.error(e));
+      }
+    });
+  }
+
+  // order form (if you have a dedicated form)
+  const orderForm = document.getElementById('orderForm');
+  if (orderForm) {
+    orderForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const f = new FormData(orderForm);
+      const payload = {
+        cropId: f.get('cropId'),
+        quantity: Number(f.get('quantity') || 1),
+        address: f.get('address') || ''
+      };
+      const res = await createOrder(payload);
+      alert(res.message || JSON.stringify(res));
+      fetchOrders().then(renderOrders).catch(e => console.error(e));
+    });
+  }
+
+  // order buttons on crop list
+  document.addEventListener('click', async (e) => {
+    if (e.target && e.target.classList.contains('order-btn')) {
+      const cropId = e.target.dataset.id;
+      const qty = parseInt(prompt('Quantity to order', '1')) || 1;
+      const address = prompt('Delivery address', '') || '';
+      const res = await createOrder({ cropId, quantity: qty, address });
+      alert(res.message || JSON.stringify(res));
+      fetchOrders().then(renderOrders).catch(e => console.error(e));
+    }
+  });
+});
+
 </script>
 
 </body>

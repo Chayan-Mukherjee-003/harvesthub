@@ -30,10 +30,8 @@
 <body class="bg-gray-100">
 
     <div class="relative min-h-screen md:flex">
-        <!-- Mobile Sidebar Backdrop -->
         <div id="sidebar-backdrop" class="sidebar-backdrop fixed inset-0 z-20 hidden"></div>
 
-        <!-- Sidebar Navigation -->
         <aside id="sidebar" class="w-64 bg-white border-r fixed inset-y-0 left-0 z-30 transform -translate-x-full md:relative md:translate-x-0">
             <div class="flex flex-col h-full">
                 <div class="h-16 flex items-center justify-center border-b">
@@ -62,7 +60,6 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <header class="h-16 flex items-center justify-between px-6 bg-white border-b">
                  <div class="flex items-center">
@@ -71,39 +68,34 @@
                     </button>
                     <h1 id="page-title" class="text-xl md:text-2xl font-semibold text-gray-800">Incoming Orders</h1>
                  </div>
-                 <div class="flex items-center font-semibold text-sm sm:text-base">
+                 <div id="welcome-message" class="flex items-center font-semibold text-sm sm:text-base">
                     Welcome, Ram Singh
                  </div>
             </header>
             
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
-                <!-- Orders View -->
                 <div id="orders-view" class="view">
                     <div id="order-list" class="space-y-4">
-                        <!-- Order items will be injected here -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- My Crops View -->
                 <div id="crops-view" class="view hidden">
                     <div class="flex justify-end mb-4">
                         <button id="add-crop-btn" class="bg-green-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700">Add New Crop</button>
                     </div>
                     <div id="crop-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                       <!-- Crop cards will be injected here -->
-                    </div>
+                       </div>
                 </div>
                 
-                <!-- Profile View -->
                 <div id="profile-view" class="view hidden">
                     <div class="bg-white p-6 md:p-8 rounded-lg shadow-md max-w-2xl mx-auto">
                         <h2 class="text-2xl font-bold mb-6">Your Profile</h2>
                         <div class="space-y-4">
-                            <div>
+                            <div id="profile-name-container">
                                 <label class="font-semibold text-gray-600">Name</label>
                                 <p id="profile-name" class="text-lg">Ram Singh</p>
                             </div>
-                             <div>
+                             <div id="profile-location-container">
                                 <label class="font-semibold text-gray-600">Location</label>
                                 <p id="profile-location" class="text-lg">Bhopal, MP</p>
                             </div>
@@ -116,14 +108,15 @@
                                 <p id="profile-rating" class="text-lg flex items-center"><span class="text-yellow-500 mr-1">★</span> 4.8</p>
                             </div>
                         </div>
-                        <button class="mt-6 bg-blue-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-600">Edit Profile</button>
+                        <div id="profile-actions" class="mt-6">
+                            <button id="edit-profile-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-600">Edit Profile</button>
+                        </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Crop Modal (for Add/Edit) -->
     <div id="crop-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden p-4">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
             <form id="crop-form" class="p-6 space-y-4">
@@ -163,6 +156,122 @@
     </div>
     
 <script>
+
+
+const API_HOST = (location.protocol === 'file:') ? 'http://localhost:4000' : '';
+const API_BASE = `${API_HOST}/api/farmer`;
+
+function authHeaders() {
+  const token = localStorage.getItem('token');
+  return token ? { 'Authorization': 'Bearer ' + token } : {};
+}
+
+async function farmerRegister(data) {
+  const res = await fetch(`${API_BASE}/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+async function farmerLogin(credentials) {
+  const res = await fetch(`${API_BASE}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  const json = await res.json();
+  if (json.token) localStorage.setItem('token', json.token);
+  return json;
+}
+
+async function fetchCrops() {
+  const res = await fetch(`${API_BASE}/crops`, {
+    headers: { ...authHeaders() }
+  });
+  if (!res.ok) {
+    console.error('Failed to fetch crops', res.status);
+    return [];
+  }
+  return res.json();
+}
+
+async function createCrop(crop) {
+  // If backend expects JSON:
+  const res = await fetch(`${API_BASE}/crops`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(crop)
+  });
+  return res.json();
+}
+
+function renderCrops(items = []) {
+  const container = document.getElementById('cropsList');
+  if (!container) return;
+  container.innerHTML = items.length
+    ? items.map(c => `<div class="crop-item"><strong>${escapeHtml(c.name)}</strong> — ${c.quantity} @ ${c.price}</div>`).join('')
+    : '<div>No crops found</div>';
+}
+
+function escapeHtml(str='') {
+  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // auto-load crops
+  fetchCrops().then(renderCrops).catch(e => console.error(e));
+
+  const regForm = document.getElementById('registerForm');
+  if (regForm) {
+    regForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = new FormData(regForm);
+      const payload = {
+        name: form.get('name'),
+        email: form.get('email'),
+        password: form.get('password')
+      };
+      const res = await farmerRegister(payload);
+      console.log('register result', res);
+      alert(res.message || JSON.stringify(res));
+    });
+  }
+
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = new FormData(loginForm);
+      const payload = { email: form.get('email'), password: form.get('password') };
+      const res = await farmerLogin(payload);
+      console.log('login result', res);
+      alert(res.message || (res.token ? 'Logged in' : JSON.stringify(res)));
+    });
+  }
+
+  const cropForm = document.getElementById('cropForm');
+  if (cropForm) {
+    cropForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = new FormData(cropForm);
+      // if you have an image upload handled by backend, use FormData and adjust endpoint accordingly.
+      const payload = {
+        name: form.get('name'),
+        price: Number(form.get('price') || 0),
+        quantity: Number(form.get('quantity') || 0),
+        description: form.get('description') || ''
+      };
+      const res = await createCrop(payload);
+      console.log('create crop', res);
+      alert(res.message || JSON.stringify(res));
+      // refresh list
+      fetchCrops().then(renderCrops).catch(e => console.error(e));
+    });
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- MOCK DATA ---
@@ -194,6 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cropForm = document.getElementById('crop-form');
     const sidebar = document.getElementById('sidebar');
     const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    const welcomeMessage = document.getElementById('welcome-message');
+    const profileActions = document.getElementById('profile-actions');
     
     // --- RENDER FUNCTIONS ---
     function renderOrders() {
@@ -228,7 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const orderCard = `
                 <div class="bg-white p-4 rounded-lg shadow-md" data-order-card-id="${order.id}">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-                        <!-- Left Section: Retailer & Items -->
                         <div class="flex-grow">
                             <p class="font-bold text-lg">${order.retailer}</p>
                             <p class="text-sm text-gray-500">Order ID: ${order.id}</p>
@@ -236,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p class="text-sm text-gray-600">${order.items.map(i => `${i.qty} ${i.unit} ${i.name}`).join(', ')}</p>
                         </div>
 
-                        <!-- Right Section: Status, Price & Actions -->
                         <div class="flex flex-col items-start md:items-end space-y-3 md:space-y-2 flex-shrink-0 md:ml-6">
                             <div class="text-left md:text-right">
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${order.status}</span>
@@ -278,6 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('profile-location').textContent = farmerProfile.location;
         document.getElementById('profile-kisan-id').textContent = farmerProfile.kisanId;
         document.getElementById('profile-rating').innerHTML = `<span class="text-yellow-500 mr-1">★</span> ${farmerProfile.rating}`;
+        // Update header welcome message
+        welcomeMessage.textContent = `Welcome, ${farmerProfile.name}`;
     }
 
     // --- SIDEBAR & NAVIGATION ---
@@ -300,8 +411,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`${view}-view`).classList.remove('hidden');
             
             // Update nav link styles
-            document.querySelectorAll('#main-nav a').forEach(a => a.classList.remove('bg-green-600', 'text-white'));
+            document.querySelectorAll('#main-nav a').forEach(a => {
+                a.classList.remove('bg-green-600', 'text-white');
+                a.classList.add('text-gray-600', 'hover:bg-gray-100');
+            });
             link.classList.add('bg-green-600', 'text-white');
+            link.classList.remove('text-gray-600', 'hover:bg-gray-100');
             
             // Update page title
             const titleMap = {
@@ -416,6 +531,57 @@ document.addEventListener('DOMContentLoaded', () => {
         
         renderCrops();
         cropModal.classList.add('hidden');
+    });
+
+    // --- NEW: Profile Edit/Save/Cancel Logic ---
+    profileActions.addEventListener('click', (e) => {
+        const targetId = e.target.id;
+        if (!targetId) return;
+
+        const nameContainer = document.getElementById('profile-name-container');
+        const locationContainer = document.getElementById('profile-location-container');
+
+        if (targetId === 'edit-profile-btn') {
+            // Switch to Edit Mode
+            nameContainer.innerHTML = `
+                <label for="profile-name-input" class="font-semibold text-gray-600">Name</label>
+                <input type="text" id="profile-name-input" class="w-full mt-1 p-2 border rounded-md text-lg" value="${farmerProfile.name}">
+            `;
+            locationContainer.innerHTML = `
+                <label for="profile-location-input" class="font-semibold text-gray-600">Location</label>
+                <input type="text" id="profile-location-input" class="w-full mt-1 p-2 border rounded-md text-lg" value="${farmerProfile.location}">
+            `;
+            profileActions.innerHTML = `
+                <button id="save-profile-btn" class="px-4 py-2 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700">Save Changes</button>
+                <button id="cancel-profile-btn" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 ml-2">Cancel</button>
+            `;
+        }
+
+        if (targetId === 'save-profile-btn' || targetId === 'cancel-profile-btn') {
+            // Save Changes (if applicable) and Switch to View Mode
+            if (targetId === 'save-profile-btn') {
+                const newName = document.getElementById('profile-name-input').value;
+                const newLocation = document.getElementById('profile-location-input').value;
+                farmerProfile.name = newName;
+                farmerProfile.location = newLocation;
+            }
+
+            // Restore the original HTML structure for the view
+            nameContainer.innerHTML = `
+                <label class="font-semibold text-gray-600">Name</label>
+                <p id="profile-name" class="text-lg"></p>
+            `;
+            locationContainer.innerHTML = `
+                <label class="font-semibold text-gray-600">Location</label>
+                <p id="profile-location" class="text-lg"></p>
+            `;
+            profileActions.innerHTML = `
+                <button id="edit-profile-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-600">Edit Profile</button>
+            `;
+
+            // Re-render the profile with the (potentially new) data
+            renderProfile();
+        }
     });
 
     // --- INITIALIZATION ---

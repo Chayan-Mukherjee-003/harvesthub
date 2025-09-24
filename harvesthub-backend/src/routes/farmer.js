@@ -2,6 +2,15 @@ import express from 'express';
 import Crop from '../models/Crop.js';
 import Order from '../models/Order.js';
 import auth from '../middleware/auth.js';  // must check farmer role
+console.log('auth typeof:', typeof auth, 'auth default is function?', typeof auth === 'function');
+
+console.log('farmer.js loaded — typeof auth:', typeof auth, 'auth:', auth);
+try {
+  const maybeMw = auth && auth(['farmer']);
+  console.log('called auth(["farmer"]) => typeof:', typeof maybeMw, Object.prototype.toString.call(maybeMw));
+} catch (err) {
+  console.error('calling auth([...]) threw:', err);
+}
 
 const router = express.Router();
 
