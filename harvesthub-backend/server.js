@@ -29,7 +29,7 @@ const frontendPath = path.join(__dirname, '../harvesthub-frontend');
 app.use(express.static(frontendPath));
 
 // If request is not for API, serve frontend entry (harvesthub.html)
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   if (req.path.startsWith('/api/')) return res.status(404).send('API route not found');
   res.sendFile(path.join(frontendPath, 'harvesthub.html'));
 });
