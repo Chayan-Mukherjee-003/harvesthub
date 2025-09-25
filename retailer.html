@@ -20,16 +20,23 @@
         .body-no-scroll {
             overflow: hidden;
         }
+        /* Fix for modal backdrop clicks */
+        .modal-container {
+            position: relative;
+        }
+        .modal-content {
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <div class="relative min-h-screen md:flex">
         <!-- Mobile Sidebar Backdrop -->
-        <div id="sidebar-backdrop" class="sidebar-backdrop fixed inset-0 z-20 hidden"></div>
+        <div id="sidebar-backdrop" class="sidebar-backdrop fixed inset-0 z-20 hidden md:hidden"></div>
 
         <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="w-64 bg-white border-r fixed inset-y-0 left-0 z-30 transform -translate-x-full md:relative md:translate-x-0">
+        <aside id="sidebar" class="w-64 bg-white border-r fixed inset-y-0 left-0 z-30 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out">
             <div class="flex flex-col h-full">
                 <div class="h-16 flex items-center justify-center border-b">
                     <a href="#" class="text-2xl font-bold text-green-600">Harvest Hub</a>
@@ -45,7 +52,7 @@
                     </a>
                 </nav>
                 <div class="p-4 border-t">
-                     <a href="#" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+                    <a href="#" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
                         <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         Logout
                     </a>
@@ -54,26 +61,26 @@
         </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 flex flex-col overflow-hidden md:ml-0">
             <header class="h-16 flex items-center justify-between px-6 bg-white border-b">
-                 <div class="flex items-center">
+                <div class="flex items-center">
                     <button id="mobile-menu-btn" class="md:hidden mr-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                     <h1 id="page-title" class="text-xl md:text-2xl font-semibold text-gray-800">Farmers Nearby</h1>
-                 </div>
-                 <div class="flex items-center">
+                </div>
+                <div class="flex items-center">
                     <button id="cart-button" class="relative mr-4">
                         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
                     </button>
                     <div class="font-semibold text-sm sm:text-base hidden sm:block">Welcome, Retailer Inc.</div>
-                 </div>
+                </div>
             </header>
             
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
                 <!-- Dashboard View -->
-                <div id="dashboard-view">
+                <div id="dashboard-view" class="view">
                     <div class="mb-6">
                         <input type="text" id="search-bar" placeholder="Search for farmers or crops..." class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                     </div>
@@ -83,7 +90,7 @@
                 </div>
 
                 <!-- My Orders View -->
-                <div id="orders-view" class="hidden">
+                <div id="orders-view" class="view hidden">
                     <div id="order-list" class="space-y-4">
                         <!-- Order items will be injected here -->
                     </div>
@@ -93,64 +100,72 @@
     </div>
 
     <!-- Product Modal -->
-    <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden p-4">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-            <div class="p-4 border-b flex justify-between items-center flex-shrink-0">
-                <h2 class="text-xl md:text-2xl font-semibold">Products from <span id="modal-farmer-name"></span></h2>
-                <button class="close-modal-btn text-2xl font-bold">&times;</button>
-            </div>
-            <div id="modal-body" class="p-4 md:p-6 overflow-y-auto">
-                <!-- Product list will be injected here -->
-            </div>
-            <div class="p-4 border-t bg-gray-50 text-right flex-shrink-0">
-                <button class="close-modal-btn px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Close</button>
+    <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-backdrop absolute inset-0"></div>
+        <div class="modal-container relative w-full max-w-3xl max-h-[90vh] flex flex-col">
+            <div class="bg-white rounded-lg shadow-xl flex flex-col max-h-full">
+                <div class="p-4 border-b flex justify-between items-center flex-shrink-0">
+                    <h2 class="text-xl md:text-2xl font-semibold">Products from <span id="modal-farmer-name"></span></h2>
+                    <button class="close-modal-btn text-2xl font-bold">&times;</button>
+                </div>
+                <div id="modal-body" class="p-4 md:p-6 overflow-y-auto">
+                    <!-- Product list will be injected here -->
+                </div>
+                <div class="p-4 border-t bg-gray-50 text-right flex-shrink-0">
+                    <button class="close-modal-btn px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Close</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Cart Modal -->
-    <div id="cart-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden p-4">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
-            <div class="p-4 border-b flex justify-between items-center">
-                <h2 class="text-xl md:text-2xl font-semibold">Your Order</h2>
-                <button id="close-cart-btn" class="text-2xl font-bold">&times;</button>
-            </div>
-            <div id="cart-items" class="p-6 max-h-96 overflow-y-auto">
-                <!-- Cart items will be injected here -->
-            </div>
-            <div class="p-6 border-t bg-gray-50">
-                <div class="flex justify-between font-bold text-lg mb-4">
-                    <span>Total:</span>
-                    <span id="cart-total">₹0.00</span>
+    <div id="cart-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-backdrop absolute inset-0"></div>
+        <div class="modal-container relative w-full max-w-lg">
+            <div class="bg-white rounded-lg shadow-xl">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h2 class="text-xl md:text-2xl font-semibold">Your Order</h2>
+                    <button id="close-cart-btn" class="text-2xl font-bold">&times;</button>
                 </div>
-                 <div class="flex justify-between font-semibold text-md text-green-600 mb-4">
-                    <span>20% Upfront Payment:</span>
-                    <span id="cart-upfront">₹0.00</span>
+                <div id="cart-items" class="p-6 max-h-96 overflow-y-auto">
+                    <!-- Cart items will be injected here -->
                 </div>
-                <button id="checkout-btn" class="w-full bg-green-600 text-white py-3 rounded-md font-bold hover:bg-green-700 disabled:bg-gray-400" disabled>Proceed to Pay</button>
+                <div class="p-6 border-t bg-gray-50">
+                    <div class="flex justify-between font-bold text-lg mb-4">
+                        <span>Total:</span>
+                        <span id="cart-total">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between font-semibold text-md text-green-600 mb-4">
+                        <span>20% Upfront Payment:</span>
+                        <span id="cart-upfront">₹0.00</span>
+                    </div>
+                    <button id="checkout-btn" class="w-full bg-green-600 text-white py-3 rounded-md font-bold hover:bg-green-700 disabled:bg-gray-400" disabled>Proceed to Pay</button>
+                </div>
             </div>
         </div>
     </div>
     
     <!-- Success Modal -->
-    <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden p-4">
-        <div class="bg-white rounded-lg shadow-xl p-8 text-center max-w-sm w-full">
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            </div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Order Placed!</h3>
-            <div class="mt-2 px-7 py-3">
-                <p class="text-sm text-gray-500">Your order has been sent. You can track its status in the 'My Orders' section.</p>
-            </div>
-            <div class="mt-4">
-                <button id="close-success-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">OK</button>
+    <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-backdrop absolute inset-0"></div>
+        <div class="modal-container relative w-full max-w-sm">
+            <div class="bg-white rounded-lg shadow-xl p-8 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Order Placed!</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">Your order has been sent. You can track its status in the 'My Orders' section.</p>
+                </div>
+                <div class="mt-4">
+                    <button id="close-success-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">OK</button>
+                </div>
             </div>
         </div>
     </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
     // --- MOCK DATA ---
     const farmers = [
         { id: 1, name: 'Ram Singh', location: 'Bhopal, MP', rating: 4.8, image: 'https://placehold.co/100x100/A3E635/4D7C0F?text=RS', products: [
@@ -190,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 
     // --- RENDER FUNCTIONS ---
-    function renderFarmers(farmersToRender) {
+    function renderFarmers(farmersToRender = farmers) {
         farmerList.innerHTML = '';
         if (farmersToRender.length === 0) {
             farmerList.innerHTML = `<p class="text-gray-500 col-span-full text-center">No farmers found.</p>`;
@@ -246,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p class="font-bold text-lg mt-1">₹${order.total.toFixed(2)}</p>
                         </div>
                     </div>
-                    ${order.status === 'Delivered' ? '<button class="rate-btn mt-3 text-sm text-blue-600 hover:underline">Rate this transaction</button>' : ''}
+                    ${order.status === 'Delivered' ? '<button class="rate-btn mt-3 text-sm text-blue-600 hover:underline" data-order-id="' + order.id + '">Rate this transaction</button>' : ''}
                 </div>`;
             orderList.innerHTML += orderItem;
         });
@@ -324,21 +339,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function switchView(view) {
+        // Hide all views
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+        
+        // Show the selected view
         document.getElementById(`${view}-view`).classList.remove('hidden');
         
+        // Update navigation styling
         document.querySelectorAll('.nav-link').forEach(a => {
             a.classList.remove('bg-green-600', 'text-white');
-            a.classList.add('text-gray-600');
+            a.classList.add('text-gray-600', 'hover:bg-gray-100');
         });
         
         const activeLink = document.querySelector(`.nav-link[data-view="${view}"]`);
         activeLink.classList.add('bg-green-600', 'text-white');
-        activeLink.classList.remove('text-gray-600');
+        activeLink.classList.remove('text-gray-600', 'hover:bg-gray-100');
 
+        // Update page title
         pageTitle.textContent = view === 'dashboard' ? 'Farmers Nearby' : 'My Orders';
-        if (view === 'orders') renderOrders();
+        
+        // Render content if needed
+        if (view === 'orders') {
+            renderOrders();
+        } else if (view === 'dashboard') {
+            renderFarmers();
+        }
 
+        // Close sidebar on mobile after navigation
         if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) {
             toggleSidebar();
         }
@@ -356,6 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Search functionality
     document.getElementById('search-bar').addEventListener('keyup', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const filteredFarmers = farmers.filter(farmer => 
@@ -366,6 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFarmers(filteredFarmers);
     });
 
+    // Farmer list event delegation
     farmerList.addEventListener('click', e => {
         const button = e.target.closest('.view-products-btn');
         if (button) {
@@ -375,36 +404,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Product modal event delegation
     productModal.addEventListener('click', e => {
-        if (e.target.matches('.close-modal-btn')) {
+        // Close modal when clicking on backdrop or close button
+        if (e.target === productModal || e.target.matches('.close-modal-btn')) {
             productModal.classList.add('hidden');
         }
+        
+        // Add to cart functionality
         if (e.target.matches('.add-to-cart-btn')) {
             const button = e.target;
             const productId = button.dataset.productId;
             const farmerId = button.dataset.farmerId;
-            const quantity = parseInt(button.previousElementSibling.value);
+            const quantityInput = button.previousElementSibling;
+            const quantity = parseInt(quantityInput.value);
 
             if (isNaN(quantity) || quantity <= 0) {
-                alert('Please enter a valid quantity.'); return;
+                alert('Please enter a valid quantity.');
+                return;
             }
 
             const farmer = farmers.find(f => f.id == farmerId);
             const product = farmer.products.find(p => p.id == productId);
             
-            // Allow cart items from multiple farmers. For a real app, you might restrict this.
-            if (cart.length > 0 && cart.some(item => item.farmerId !== farmer.id)) {
-                 if (!confirm("You have items from another farmer in your cart. Starting a new cart will clear the existing one. Continue?")) {
+            // Check if cart already has items from a different farmer
+            if (cart.length > 0 && cart.some(item => item.farmerId != farmer.id)) {
+                if (!confirm("You have items from another farmer in your cart. Starting a new cart will clear the existing one. Continue?")) {
                     return;
                 }
                 cart = []; // Clear cart if user agrees
             }
 
+            // Add item to cart
             const existingItem = cart.find(item => item.id == productId);
             if(existingItem) {
                 existingItem.quantity += quantity;
             } else {
-                cart.push({ ...product, quantity, farmerName: farmer.name, farmerId: farmer.id });
+                cart.push({ 
+                    ...product, 
+                    quantity, 
+                    farmerName: farmer.name, 
+                    farmerId: farmer.id 
+                });
             }
             
             renderCart();
@@ -412,10 +453,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Cart modal functionality
     cartModal.addEventListener('click', e => {
-        if (e.target.matches('#close-cart-btn')) {
+        // Close modal when clicking on backdrop or close button
+        if (e.target === cartModal || e.target.matches('#close-cart-btn')) {
             cartModal.classList.add('hidden');
         }
+        
+        // Checkout functionality
         if (e.target.matches('#checkout-btn')) {
             if(cart.length === 0) return;
 
@@ -433,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newOrder = {
                     id: `HH${String(orders.length + 1).padStart(3, '0')}`,
                     farmer: farmerName,
-                    date: new Date().toISOString().split('T')[0], // Today's date
+                    date: new Date().toISOString().split('T')[0],
                     total: total,
                     status: 'Pending',
                     items: items.map(i => ({ name: i.name, qty: i.quantity, unit: i.unit }))
@@ -448,170 +493,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // Cart button functionality
     document.getElementById('cart-button').addEventListener('click', () => {
         renderCart();
         cartModal.classList.remove('hidden');
     });
 
+    // Success modal functionality
     successModal.addEventListener('click', (e) => {
-        if (e.target.matches('#close-success-btn')) {
+        if (e.target === successModal || e.target.matches('#close-success-btn')) {
             successModal.classList.add('hidden');
             switchView('orders'); // Switch to orders view to see the new order
         }
     });
 
+    // Order list event delegation for rating buttons
     orderList.addEventListener('click', e => {
         if (e.target.matches('.rate-btn')) {
-            alert('Rating functionality would be here!');
+            const orderId = e.target.dataset.orderId;
+            alert(`Rating functionality for order ${orderId} would be implemented here!`);
+        }
+    });
+
+    // Close modals when pressing Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            productModal.classList.add('hidden');
+            cartModal.classList.add('hidden');
+            successModal.classList.add('hidden');
         }
     });
 
     // --- INITIALIZATION ---
-    renderFarmers(farmers);
+    renderFarmers();
+    renderCart();
+    switchView('dashboard'); // Set initial view
 });
-
-const API_HOST_RETAILER = (location.protocol === 'file:') ? 'http://localhost:4000' : '';
-const RETAILER_BASE = `${API_HOST_RETAILER}/api/retailer`;
-
-function retailerAuthHeaders() {
-  const token = localStorage.getItem('token');
-  return token ? { 'Authorization': 'Bearer ' + token } : {};
-}
-
-async function retailerRegister(data) {
-  const res = await fetch(`${RETAILER_BASE}/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  return res.json();
-}
-
-async function retailerLogin(credentials) {
-  const res = await fetch(`${RETAILER_BASE}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials)
-  });
-  const json = await res.json();
-  if (json.token) localStorage.setItem('token', json.token);
-  return json;
-}
-
-async function fetchAvailableCrops() {
-  const res = await fetch(`${RETAILER_BASE}/crops`, {
-    headers: { ...retailerAuthHeaders() }
-  });
-  if (!res.ok) {
-    console.error('Failed to fetch crops', res.status);
-    return [];
-  }
-  return res.json();
-}
-
-async function createOrder(order) {
-  const res = await fetch(`${RETAILER_BASE}/orders`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...retailerAuthHeaders() },
-    body: JSON.stringify(order)
-  });
-  return res.json();
-}
-
-async function fetchOrders() {
-  const res = await fetch(`${RETAILER_BASE}/orders`, {
-    headers: { ...retailerAuthHeaders() }
-  });
-  if (!res.ok) {
-    console.error('Failed to fetch orders', res.status);
-    return [];
-  }
-  return res.json();
-}
-
-function renderCrops(items = []) {
-  const container = document.getElementById('cropsList');
-  if (!container) return;
-  container.innerHTML = items.length
-    ? items.map(c => `<div class="crop-item"><strong>${escapeHtml(c.name)}</strong> — ${c.quantity} @ ${c.price} <button data-id="${escapeHtml(c._id)}" class="order-btn">Order</button></div>`).join('')
-    : '<div>No crops available</div>';
-}
-
-function renderOrders(items = []) {
-  const container = document.getElementById('ordersList');
-  if (!container) return;
-  container.innerHTML = items.length
-    ? items.map(o => `<div class="order-item">#${escapeHtml(o._id)} — ${escapeHtml(o.crop?.name || o.itemName || '')} x${o.quantity} — ${o.status || 'pending'}</div>`).join('')
-    : '<div>No orders</div>';
-}
-
-function escapeHtml(str='') {
-  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  // load crops and orders
-  fetchAvailableCrops().then(renderCrops).catch(e => console.error(e));
-  fetchOrders().then(renderOrders).catch(e => console.error(e));
-
-  // register form
-  const regForm = document.getElementById('registerForm');
-  if (regForm) {
-    regForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const f = new FormData(regForm);
-      const payload = { name: f.get('name'), email: f.get('email'), password: f.get('password') };
-      const res = await retailerRegister(payload);
-      alert(res.message || JSON.stringify(res));
-    });
-  }
-
-  // login form
-  const loginForm = document.getElementById('loginForm');
-  if (loginForm) {
-    loginForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const f = new FormData(loginForm);
-      const res = await retailerLogin({ email: f.get('email'), password: f.get('password') });
-      alert(res.message || (res.token ? 'Logged in' : JSON.stringify(res)));
-      // refresh after login
-      if (res.token) {
-        fetchAvailableCrops().then(renderCrops).catch(e => console.error(e));
-        fetchOrders().then(renderOrders).catch(e => console.error(e));
-      }
-    });
-  }
-
-  // order form (if you have a dedicated form)
-  const orderForm = document.getElementById('orderForm');
-  if (orderForm) {
-    orderForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const f = new FormData(orderForm);
-      const payload = {
-        cropId: f.get('cropId'),
-        quantity: Number(f.get('quantity') || 1),
-        address: f.get('address') || ''
-      };
-      const res = await createOrder(payload);
-      alert(res.message || JSON.stringify(res));
-      fetchOrders().then(renderOrders).catch(e => console.error(e));
-    });
-  }
-
-  // order buttons on crop list
-  document.addEventListener('click', async (e) => {
-    if (e.target && e.target.classList.contains('order-btn')) {
-      const cropId = e.target.dataset.id;
-      const qty = parseInt(prompt('Quantity to order', '1')) || 1;
-      const address = prompt('Delivery address', '') || '';
-      const res = await createOrder({ cropId, quantity: qty, address });
-      alert(res.message || JSON.stringify(res));
-      fetchOrders().then(renderOrders).catch(e => console.error(e));
-    }
-  });
-});
-
 </script>
 
 </body>
